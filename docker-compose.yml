@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    container_name: wow-server
+    environment:
+      WOW_SERVER_ADDR: 0.0.0.0:4000
+      WOW_HMAC_SECRET: dev-secret-change-me
+    ports:
+      - "4000:4000"
+    restart: unless-stopped
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: wow-client
+    depends_on:
+      - server
+    environment:
+      WOW_SERVER_ADDR: server:4000
+    restart: "no"
