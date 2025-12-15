@@ -26,6 +26,7 @@ const (
 
 	maxRequestLineBytes = 32  // e.g. "CHALLENGE" or "QUOTE"
 	maxJSONPayloadBytes = 400 // max size for signed challenge + solution JSON
+	bufSize             = 512 // buffered reader size
 )
 
 var powAlgo = hash_pow.NewHashcash_SHA256()
@@ -84,7 +85,7 @@ func handleConn(conn net.Conn, qp QuoteProvider) {
 	// Stateless text protocol:
 	// 1) Client sends:  "CHALLENGE\n" -> server replies with signed challenge JSON and closes.
 	// 2) Client sends:  "QUOTE\n" -> server reads signed challenge JSON + solution JSON, verifies, replies with quote.
-	r := bufio.NewReaderSize(conn, maxRequestLineBytes+1)
+	r := bufio.NewReaderSize(conn, bufSize)
 
 	// Read command with a hard size limit to avoid buffering large input.
 	line, isPrefix, err := r.ReadLine()
@@ -207,7 +208,10 @@ func calibrateDifficulty(active int64) uint8 {
 
 func signChallenge(ch *pow.Challenge, expiresAt int64) string {
 	mac := hmac.New(sha256.New, secret)
-	io.WriteString(mac, challengeSigPayload(ch, expiresAt))
+	_, err := io.WriteString(mac, challengeSigPayload(ch, expiresAt))
+	if err != nil {
+		log.Fatalf("failed to write challenge payload to HMAC: %v", err)
+	}
 	return hex.EncodeToString(mac.Sum(nil))
 }
 
