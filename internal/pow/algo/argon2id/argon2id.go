@@ -22,7 +22,7 @@ type Params struct {
 func defaultParams() Params {
 	return Params{
 		Time:    1,
-		Memory:  64 * 1024, // 64 MiB
+		Memory:  8 * 1024,
 		Threads: 1,
 		KeyLen:  32,
 		Salt:    16,

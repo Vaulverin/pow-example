@@ -15,8 +15,6 @@ var hashAlgos = []func() pow.Algorithm{
 	hash_pow.NewSha3_256,
 }
 
-// 5 levels: easy -> very hard.
-// Note: difficulty is "leading zero bits".
 var hashDifficulties = []uint8{0, 25, 50, 75, 100, 200}
 
 func BenchmarkHashPoW_Verify_ByDifficulty(b *testing.B) {

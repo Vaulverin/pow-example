@@ -21,7 +21,7 @@ type Params struct {
 
 func defaultParams() Params {
 	return Params{
-		N:      1 << 15, // 32768
+		N:      1 << 12, // 4096
 		R:      8,
 		P:      1,
 		KeyLen: 32,

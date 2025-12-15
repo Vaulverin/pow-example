@@ -25,20 +25,15 @@ var cases = []algoCase{
 	{newAlgo: hash_pow.NewHashcash_SHA256, difficulty: 0, timeout: 2 * time.Second},
 	{newAlgo: hash_pow.NewBlake3_256, difficulty: 0, timeout: 2 * time.Second},
 	{newAlgo: hash_pow.NewSha3_256, difficulty: 0, timeout: 2 * time.Second},
-	{newAlgo: scrypt.New, difficulty: 0, timeout: 120 * time.Second},
-	{newAlgo: argon2id.New, difficulty: 0, timeout: 120 * time.Second},
+	{newAlgo: scrypt.New, difficulty: 0, timeout: 20 * time.Second},
+	{newAlgo: argon2id.New, difficulty: 0, timeout: 20 * time.Second},
 }
 
 func TestAlgorithms_SolveAndVerify(t *testing.T) {
 	for _, tc := range cases {
 		algo := tc.newAlgo()
 		t.Run(algo.Name(), func(t *testing.T) {
-			if tc.timeout > 5*time.Second {
-				t.Skip()
-			}
-			if tc.timeout < 5*time.Second {
-				t.Parallel()
-			}
+			t.Parallel()
 			ch, err := algo.NewChallenge(tc.difficulty)
 			if err != nil {
 				t.Fatalf("NewChallenge error: %v", err)
@@ -84,9 +79,6 @@ func TestAlgorithms_InvalidSolutionRejected(t *testing.T) {
 	for _, tc := range cases {
 		algo := tc.newAlgo()
 		t.Run(algo.Name(), func(t *testing.T) {
-			if tc.timeout > 5*time.Second {
-				t.Skip()
-			}
 			t.Parallel()
 			ch, err := algo.NewChallenge(tc.difficulty)
 			if err != nil {
@@ -105,12 +97,7 @@ func TestChallengeAndSolution_JSONRoundtrip(t *testing.T) {
 	for _, tc := range cases {
 		algo := tc.newAlgo()
 		t.Run(algo.Name(), func(t *testing.T) {
-			if tc.timeout > 5*time.Second {
-				t.Skip()
-			}
-			if tc.timeout < 5*time.Second {
-				t.Parallel()
-			}
+			t.Parallel()
 			ch, err := algo.NewChallenge(tc.difficulty)
 			if err != nil {
 				t.Fatalf("NewChallenge error: %v", err)

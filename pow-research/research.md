@@ -69,49 +69,49 @@ pkg: pow-example/pow-research/pow_algos
 cpu: Apple M3 Pro
 BenchmarkNewChallenge
 BenchmarkNewChallenge/hashcash
-BenchmarkNewChallenge/hashcash-12         	 2977981	       370.6 ns/op	     352 B/op	       6 allocs/op
+BenchmarkNewChallenge/hashcash-12         	 3128229	       368.7 ns/op	     352 B/op	       6 allocs/op
 BenchmarkNewChallenge/blake3
-BenchmarkNewChallenge/blake3-12           	 3325854	       361.0 ns/op	     352 B/op	       6 allocs/op
+BenchmarkNewChallenge/blake3-12           	 3234890	       371.3 ns/op	     352 B/op	       6 allocs/op
 BenchmarkNewChallenge/sha3_256
-BenchmarkNewChallenge/sha3_256-12         	 3326335	       358.4 ns/op	     352 B/op	       6 allocs/op
+BenchmarkNewChallenge/sha3_256-12         	 3240117	       377.8 ns/op	     352 B/op	       6 allocs/op
 BenchmarkNewChallenge/scrypt
-BenchmarkNewChallenge/scrypt-12           	 1643445	       760.2 ns/op	     528 B/op	       9 allocs/op
+BenchmarkNewChallenge/scrypt-12           	 1594244	       746.4 ns/op	     528 B/op	       9 allocs/op
 BenchmarkNewChallenge/argon2id
-BenchmarkNewChallenge/argon2id-12         	 1571330	       724.0 ns/op	     528 B/op	       9 allocs/op
+BenchmarkNewChallenge/argon2id-12         	 1593422	       758.8 ns/op	     528 B/op	       9 allocs/op
 BenchmarkVerify
 BenchmarkVerify/hashcash
-BenchmarkVerify/hashcash-12               	 6089012	       196.2 ns/op	     224 B/op	       6 allocs/op
+BenchmarkVerify/hashcash-12               	 6675550	       205.8 ns/op	     224 B/op	       6 allocs/op
 BenchmarkVerify/blake3
-BenchmarkVerify/blake3-12                 	 5892607	       203.3 ns/op	     224 B/op	       6 allocs/op
+BenchmarkVerify/blake3-12                 	 5773732	       208.2 ns/op	     224 B/op	       6 allocs/op
 BenchmarkVerify/sha3_256
-BenchmarkVerify/sha3_256-12               	 4347142	       276.8 ns/op	     224 B/op	       6 allocs/op
+BenchmarkVerify/sha3_256-12               	 4201242	       282.3 ns/op	     224 B/op	       6 allocs/op
 BenchmarkVerify/scrypt
-BenchmarkVerify/scrypt-12                 	     129	   9234828 ns/op	 8395544 B/op	      35 allocs/op
+BenchmarkVerify/scrypt-12                 	     259	   4622443 ns/op	 4200325 B/op	      34 allocs/op
 BenchmarkVerify/argon2id
-BenchmarkVerify/argon2id-12               	     152	   7768476 ns/op	16783857 B/op	      37 allocs/op
+BenchmarkVerify/argon2id-12               	     291	   4101941 ns/op	 8394375 B/op	      36 allocs/op
 BenchmarkSolve
 BenchmarkSolve/hashcash
-BenchmarkSolve/hashcash-12                	    2866	    401980 ns/op	  314281 B/op	   11923 allocs/op
+BenchmarkSolve/hashcash-12                	    2997	    422751 ns/op	  317258 B/op	   12037 allocs/op
 BenchmarkSolve/blake3
-BenchmarkSolve/blake3-12                  	    2439	    420455 ns/op	  313692 B/op	   11902 allocs/op
+BenchmarkSolve/blake3-12                  	    2848	    417814 ns/op	  301186 B/op	   11422 allocs/op
 BenchmarkSolve/sha3_256
-BenchmarkSolve/sha3_256-12                	    2644	    526980 ns/op	  323736 B/op	   12287 allocs/op
+BenchmarkSolve/sha3_256-12                	    1909	    548306 ns/op	  329342 B/op	   12503 allocs/op
 BenchmarkSolve/scrypt
-BenchmarkSolve/scrypt-12                  	       1	9851570958 ns/op	8764796864 B/op	   38636 allocs/op
+BenchmarkSolve/scrypt-12                  	       1	2519409666 ns/op	2171485888 B/op	   18351 allocs/op
 BenchmarkSolve/argon2id
-BenchmarkSolve/argon2id-12                	       1	9107336208 ns/op	19351632976 B/op	   44774 allocs/op
+BenchmarkSolve/argon2id-12                	       2	 670745375 ns/op	1347271828 B/op	    5966 allocs/op
 PASS
 ```
 Note: Benchmark identifiers such as `hashcash`, `blake3`, and `sha3_256` correspond to Hashcash (SHA-256), BLAKE3-256, and SHA3-256 respectively.
 </details>
 
-| Algorithm           | New Challenge (ns) | Verify (ns) | Solve (ns) | (New + Verify)/Solve |
-|---------------------|--------------------|-------------|------------|----------------------|
-| Hashcash (SHA-256)  | 370.6              | 196.2       | 401980     | 0.00141              |
-| BLAKE3-256          | 361.0              | 203.3       | 420455     | 0.00134              |
-| SHA3-256            | 358.4              | 276.8       | 526980     | 0.00121              |
-| Scrypt              | 760.2              | 9234828     | 9851570958 | 0.00094              |
-| Argon2id            | 724.0              | 7768476     | 9107336208 | 0.00085              |
+| Algorithm           | New Challenge (ns) | Verify (ns) | Solve (ns)    | (New + Verify)/Solve |
+|---------------------|--------------------|-------------|---------------|----------------------|
+| Hashcash (SHA-256)  | 368.7              | 205.8       | 422751        | 0.001359             |
+| BLAKE3-256          | 371.3              | 208.2       | 417814        | 0.001387             |
+| SHA3-256            | 377.8              | 282.3       | 548306        | 0.001204             |
+| Scrypt              | 746.4              | 4622443     | 2519409666    | 0.001835             |
+| Argon2id            | 758.8              | 4101941     | 670745375     | 0.006117             |
 
 The benchmark results confirm the expected operational trade-offs.
 Memory-hard algorithms (Argon2id, Scrypt) make both solving and verification

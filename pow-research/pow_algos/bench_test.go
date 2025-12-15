@@ -2,7 +2,6 @@ package pow_algos
 
 import (
 	crand "crypto/rand"
-	"encoding/json"
 	"pow-example/internal/pow"
 	"pow-example/internal/pow/algo/argon2id"
 	"pow-example/internal/pow/algo/hash_pow"
@@ -14,41 +13,14 @@ type benchCase struct {
 	name       string
 	newAlgo    func() pow.Algorithm
 	difficulty uint8
-	tweak      func(ch *pow.Challenge)
-}
-
-func tweakScrypt(ch *pow.Challenge) {
-	// Keep it reasonably fast for benchmarks while still exercising scrypt.
-	p := scrypt.Params{
-		N:      1 << 13, // 8192
-		R:      8,
-		P:      1,
-		KeyLen: 32,
-		Salt:   16,
-	}
-	raw, _ := json.Marshal(p)
-	ch.Params = raw
-}
-
-func tweakArgon2id(ch *pow.Challenge) {
-	// Keep it reasonably fast for benchmarks (lower memory than default).
-	p := argon2id.Params{
-		Time:    1,
-		Memory:  16 * 1024, // 16 MiB
-		Threads: 1,
-		KeyLen:  32,
-		Salt:    16,
-	}
-	raw, _ := json.Marshal(p)
-	ch.Params = raw
 }
 
 var benchCases = []benchCase{
 	{name: "hashcash", newAlgo: hash_pow.NewHashcash_SHA256, difficulty: 0},
 	{name: "blake3", newAlgo: hash_pow.NewBlake3_256, difficulty: 0},
 	{name: "sha3_256", newAlgo: hash_pow.NewSha3_256, difficulty: 0},
-	{name: "scrypt", newAlgo: scrypt.New, difficulty: 0, tweak: tweakScrypt},
-	{name: "argon2id", newAlgo: argon2id.New, difficulty: 0, tweak: tweakArgon2id},
+	{name: "scrypt", newAlgo: scrypt.New, difficulty: 0},
+	{name: "argon2id", newAlgo: argon2id.New, difficulty: 0},
 }
 
 func BenchmarkNewChallenge(b *testing.B) {
@@ -81,9 +53,6 @@ func BenchmarkVerify(b *testing.B) {
 			if err != nil {
 				b.Fatalf("NewChallenge: %v", err)
 			}
-			if tc.tweak != nil {
-				tc.tweak(ch)
-			}
 
 			sol, err := algo.Solve(ch, crand.Reader)
 			if err != nil {
@@ -110,9 +79,6 @@ func BenchmarkSolve(b *testing.B) {
 			ch, err := algo.NewChallenge(tc.difficulty)
 			if err != nil {
 				b.Fatalf("NewChallenge: %v", err)
-			}
-			if tc.tweak != nil {
-				tc.tweak(ch)
 			}
 
 			b.ReportAllocs()
