@@ -5,6 +5,7 @@ go 1.25.5
 require (
 	github.com/zeebo/blake3 v0.2.4
 	golang.org/x/crypto v0.46.0
+	golang.org/x/net v0.47.0
 )
 
 require (

@@ -14,7 +14,7 @@ COPY --from=builder /app/server /server
 EXPOSE 4000
 
 ENV WOW_SERVER_ADDR=0.0.0.0:4000
-
+ENV WOW_CONN_LIMIT=1000
 ENV WOW_HMAC_SECRET=dev-secret-change-me
 
 ENTRYPOINT ["/server"]

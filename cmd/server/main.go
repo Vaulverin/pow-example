@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"golang.org/x/net/netutil"
 	"io"
 	"log"
 	"net"
@@ -32,6 +33,8 @@ var powAlgo = hash_pow.NewHashcash_SHA256()
 // activeConns is a simple load indicator used to calibrate PoW difficulty.
 var activeConns = &atomic.Int64{}
 
+var secret = []byte(internal.GetEnv("WOW_HMAC_SECRET", "dev-secret-change-me"))
+
 // signedChallenge is sent to clients. The signature allows the server to verify
 // that the challenge parameters were issued by the server and not modified by the client.
 type signedChallenge struct {
@@ -43,11 +46,13 @@ type QuoteProvider interface{ Random() string }
 
 func main() {
 	addr := internal.GetEnv("WOW_SERVER_ADDR", defaultAddr)
-
+	connLimit := internal.GetEnvInt("WOW_CONN_LIMIT", 5000)
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatalf("failed to listen on %s: %v", addr, err)
 	}
+	ln = netutil.LimitListener(ln, connLimit)
+
 	log.Printf("Word-of-Wisdom server is listening on %s", addr)
 
 	qp := quotes.NewProvider(nil)
@@ -74,6 +79,7 @@ func handleConn(conn net.Conn, qp QuoteProvider) {
 	}(conn)
 
 	_ = conn.SetDeadline(time.Now().Add(5 * time.Second))
+	_ = conn.SetReadDeadline(time.Now().Add(300 * time.Millisecond))
 
 	// Stateless text protocol:
 	// 1) Client sends:  "CHALLENGE\n" -> server replies with signed challenge JSON and closes.
@@ -124,27 +130,27 @@ func handleConn(conn net.Conn, qp QuoteProvider) {
 		dec := json.NewDecoder(lr)
 		dec.DisallowUnknownFields()
 
+		_ = conn.SetReadDeadline(time.Now().Add(1 * time.Second))
+
 		var sc signedChallenge
 		if err := dec.Decode(&sc); err != nil {
 			log.Printf("failed to decode signed challenge: %v", err)
 			return
 		}
-		if sc.Challenge == nil {
-			log.Printf("missing challenge")
+		if lr.N <= 0 {
+			log.Printf("request payload too large from %s", conn.RemoteAddr())
 			return
 		}
 		if sc.ExpiresAt <= 0 || time.Now().Unix() > sc.ExpiresAt {
 			log.Printf("expired challenge from %s", conn.RemoteAddr())
 			return
 		}
-		if sc.Sig == "" {
-			log.Printf("missing signature from %s", conn.RemoteAddr())
-			return
-		}
 		if !verifyChallengeSig(sc.Challenge, sc.ExpiresAt, sc.Sig) {
 			log.Printf("invalid challenge signature from %s", conn.RemoteAddr())
 			return
 		}
+
+		_ = conn.SetReadDeadline(time.Now().Add(1 * time.Second))
 
 		var sol pow.Solution
 		if err := dec.Decode(&sol); err != nil {
@@ -200,7 +206,6 @@ func calibrateDifficulty(active int64) uint8 {
 }
 
 func signChallenge(ch *pow.Challenge, expiresAt int64) string {
-	secret := []byte(internal.GetEnv("WOW_HMAC_SECRET", "dev-secret-change-me"))
 	mac := hmac.New(sha256.New, secret)
 	io.WriteString(mac, challengeSigPayload(ch, expiresAt))
 	return hex.EncodeToString(mac.Sum(nil))
